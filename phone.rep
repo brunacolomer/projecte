@@ -1,0 +1,4 @@
+
+string name_phone;
+nat number;
+nat freq;
