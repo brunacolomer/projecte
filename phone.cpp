@@ -5,7 +5,6 @@ Es produeix un error si name no és un identificador legal. */
 
 
 phone::phone(nat num, const string& name, nat compt) throw(error){
-    //hola
     for(nat i=0; i<name.size();i++){
         if(name[i]==DELETECHAR or name[i]==ENDCHAR or name[i]==ENDPREF) throw error(ErrNomIncorrecte);
     }

@@ -1,1 +1,7 @@
-cout<<"Funciona"<<endl;
+struct node{
+    phone p; //el p.num es el que s'utilitza per clasificar els nodes.
+    node *_esq;
+    node *_dret;
+};
+
+node *_arrel;
