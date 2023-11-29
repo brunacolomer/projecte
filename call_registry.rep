@@ -1,7 +1,12 @@
-struct node{
-    phone p; //el p.num es el que s'utilitza per clasificar els nodes.
-    node *_esq;
-    node *_dret;
+
+struct node_hash{
+    phone _p; //el p.num es el que s'utilitza per clasificar els nodes.
+    node_hash *_seg;
+    node_hash(const phone p, node_hash *seg = nullptr);
 };
 
-node *_arrel;
+node_hash **_taula;
+nat _M;
+nat _quants;
+
+node_hash::node_hash(const phone p, node_hash *seg = nullptr): _p(p), _seg(seg){}

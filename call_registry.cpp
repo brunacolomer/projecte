@@ -1,21 +1,32 @@
 #include "call_registry.hpp"
 
 /* Construeix un call_registry buit. */
-call_registry() throw(error){
-    _arrel = nullptr;
-    
+call_registry::call_registry() throw(error){
+    _M = ???;
+    _quants = 0;
+    _taula = new node_hash *[_M];
+    for(int i = 0; i<_M; ++i){
+        _taula[i] = nullptr;
+    }
 }
 
 /* Constructor per còpia, operador d'assignació i destructor. */
-call_registry(const call_registry& R) throw(error){
-    
+call_registry::call_registry(const call_registry& R) throw(error){
+    _M = R._M;
+    _quants = R._quants;
+    _taula = new node_hash *[_M];
+    for(int i = 0; i<_M; ++i){
+        _taula[i] = R._taula[i];
+    }
 }
 
-call_registry& operator=(const call_registry& R) throw(error){
-
+call_registry::call_registry& operator=(const call_registry& R) throw(error){
+    call_registry aux = call_registry(R)
+    *this = aux;
+    return *this;
 }
 
-~call_registry() throw(){
+call_registry::~call_registry() throw(){
 
 }
 
@@ -23,7 +34,7 @@ call_registry& operator=(const call_registry& R) throw(error){
 incrementant en 1 el comptador de trucades associat. Si el número no 
 estava prèviament en el call_registry afegeix una nova entrada amb 
 el número de telèfon donat, l'string buit com a nom i el comptador a 1. */
-void registra_trucada(nat num) throw(error){
+void call_registry::registra_trucada(nat num) throw(error){
 
 }
 
@@ -32,19 +43,25 @@ Si el número no estava prèviament en el call_registry, s'afegeix
 una nova entrada amb el número i nom donats, i el comptador 
 de trucades a 0. 
 Si el número existia prèviament, se li assigna el nom donat. */
-void assigna_nom(nat num, const string& name) throw(error){
+void call_registry::assigna_nom(nat num, const string& name) throw(error){
+    if(conte(num)){
 
+    }
+    else{
+        registra_trucada(num);
+
+    } 
 }
 
 /* Elimina l'entrada corresponent al telèfon el número de la qual es dóna.
 Es produeix un error si el número no estava present. */
-void elimina(nat num) throw(error){
+void call_registry::elimina(nat num) throw(error){
 
 }
 
 /* Retorna cert si i només si el call_registry conté un 
 telèfon amb el número donat. */
-bool conte(nat num) const throw(){
+bool call_registry::conte(nat num) const throw(){
 
 }
 
@@ -52,7 +69,7 @@ bool conte(nat num) const throw(){
 Aquest nom pot ser l'string buit si el número de telèfon no
 té un nom associat. Es produeix un error si el número no està en
 el call_registry. */
-string nom(nat num) const throw(error){
+string call_registry::nom(nat num) const throw(error){
 
 }
 
@@ -60,26 +77,24 @@ string nom(nat num) const throw(error){
 indicat. Aquest número pot ser 0 si no s'ha efectuat cap trucada a
 aquest número. Es produeix un error si el número no està en el 
 call_registry. */
-nat num_trucades(nat num) const throw(error){
+nat call_registry::num_trucades(nat num) const throw(error){
 
 }
 
 /* Retorna cert si i només si el call_registry està buit. */
-bool es_buit() const throw(){
-    bool buit = true;
-    if(_arrel != nullptr) buit = false
-    return buit;
+bool call_registry::es_buit() const throw(){
+    return _quants == 0;
 }
 
 /* Retorna quants números de telèfon hi ha en el call_registry. */
-nat num_entrades() const throw(){
-
+nat call_registry::num_entrades() const throw(){
+    return _quants;
 }
 
 /* Fa un bolcat de totes les entrades que tenen associat un
 nom no nul sobre un vector de phone.
 Comprova que tots els noms dels telèfons siguin diferents; 
 es produeix un error en cas contrari. */
-void dump(vector<phone>& V) const throw(error){
+void call_registry::dump(vector<phone>& V) const throw(error){
 
 }
