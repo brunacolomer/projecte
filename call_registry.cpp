@@ -35,7 +35,36 @@ incrementant en 1 el comptador de trucades associat. Si el número no
 estava prèviament en el call_registry afegeix una nova entrada amb 
 el número de telèfon donat, l'string buit com a nom i el comptador a 1. */
 void call_registry::registra_trucada(nat num) throw(error){
-
+    int pos = h(num) % _M;
+    if (_taula[pos]==nullptr){
+        node_hash *element = new node_hash;
+        phone telefon(num,"", 1);
+        element->_p = telefon;
+        element->_seg=nullptr;
+        _taula[pos] = element;
+        _quants++;
+    } else{
+        bool trobat  =false;
+        node_hash * element = _taula[pos];
+        node_hash * ant = nullptr;
+        while(element!=nullptr and not trobat and element->_k<=k){
+            if(element->_p.numero()==num) trobat = true;
+            else {
+                ant = element;
+                element=element->_seg;
+            }
+        }if(not trobat){
+            node_hash * nou = new node_hash;
+            phone telefon(num,"", 1);
+            nou->_p = telefon;
+            nou->_seg=element;
+            if(ant == nullptr) _taula[pos] = nou;
+            else ant->_seg = nou;
+            _quants++;
+        } else { //Si hi ha el telefon al call registry freq++
+            ++(element->_p);
+        }
+    }
 }
 
 /* Assigna el nom indicat al número donat.
@@ -44,24 +73,67 @@ una nova entrada amb el número i nom donats, i el comptador
 de trucades a 0. 
 Si el número existia prèviament, se li assigna el nom donat. */
 void call_registry::assigna_nom(nat num, const string& name) throw(error){
-    if(conte(num)){
-
+    int pos = (h(num))%_M;
+    bool trobat  =false;
+    node_hash * element = _taula[pos];
+    node_hash * ant = nullptr;
+    while(element!=nullptr and not trobat and element->_p.numero()<=num){
+        if(element->_p.numero()==num) trobat = true;
+        else {
+            ant = element;
+            element=element->_seg;
+        }
+    } if(trobat) {
+        int f = element->_p.frequencia();
+        phone nou(num,name,f);
+        element->_p = nou;
     }
-    else{
-        registra_trucada(num);
-
-    } 
+    else {
+        node_hash * nou = new node_hash;
+        phone telefon(num,name, 0);
+        nou->_p = telefon;
+        nou->_seg=element;
+        if(ant == nullptr) _taula[pos] = nou;
+        else ant->_seg = nou;
+        _quants++;
 }
 
 /* Elimina l'entrada corresponent al telèfon el número de la qual es dóna.
 Es produeix un error si el número no estava present. */
 void call_registry::elimina(nat num) throw(error){
-
+    int pos = (h(num))%_M;
+    bool trobat = false;
+    node_hash * element = _taula[pos];
+    node_hash * ant = nullptr;
+    while(element!=nullptr and not trobat and element->_p.numero()<=num){
+        if(element->_p.numero()==num) trobat = true;
+        else {
+            ant = element;
+            element=element->_seg;
+        }
+    }if (trobat){
+        if(ant==nullptr){
+            _taula[pos] = element;
+        } else {
+            ant->_seg = element->_seg;
+            delete element;
+        }
+    }
 }
 
 /* Retorna cert si i només si el call_registry conté un 
 telèfon amb el número donat. */
 bool call_registry::conte(nat num) const throw(){
+    int pos = (h(num))%_M;
+    bool trobat  =false;
+    node_hash * element = _taula[pos];
+    while(element!=nullptr and not trobat and element->_k<=k){
+        if(element->_k==k) trobat = true;
+        else {
+            element=element->_seg;
+        }
+    }
+    return trobat;
 
 }
 
@@ -70,7 +142,19 @@ Aquest nom pot ser l'string buit si el número de telèfon no
 té un nom associat. Es produeix un error si el número no està en
 el call_registry. */
 string call_registry::nom(nat num) const throw(error){
-
+    int pos = (h(num))%_M;
+    bool trobat  =false;
+    node_hash * element = _taula[pos];
+    while(element!=nullptr and not trobat and element->_k<=k){
+        if(element->_k==k) trobat = true;
+        else {
+            element=element->_seg;
+        }
+    }
+    if (not trobat) 
+        throw error(ErrNumeroInexistent);
+    else 
+        return element->_p.nom();
 }
 
 /* Retorna el comptador de trucades associat al número de telèfon 
@@ -78,7 +162,19 @@ indicat. Aquest número pot ser 0 si no s'ha efectuat cap trucada a
 aquest número. Es produeix un error si el número no està en el 
 call_registry. */
 nat call_registry::num_trucades(nat num) const throw(error){
-
+    int pos = (h(num))%_M;
+    bool trobat  =false;
+    node_hash * element = _taula[pos];
+    while(element!=nullptr and not trobat and element->_k<=k){
+        if(element->_k==k) trobat = true;
+        else {
+            element=element->_seg;
+        }
+    }
+    if (not trobat) 
+        throw error(ErrNumeroInexistent);
+    else 
+        return element->_p.frequencia();
 }
 
 /* Retorna cert si i només si el call_registry està buit. */
@@ -96,5 +192,22 @@ nom no nul sobre un vector de phone.
 Comprova que tots els noms dels telèfons siguin diferents; 
 es produeix un error en cas contrari. */
 void call_registry::dump(vector<phone>& V) const throw(error){
+    vector v(_quants);
+    int j=0
+    for(int i = 0; i<_M; ++i){
+        node_hash * element = _taula[i];
+        while(element!=nullptr){
+            v[j] = element->_p;
+            element = element->_seg;
+            j++;
+        }
+    }
+}
 
+// Mètodes privats
+long call_registry::h(int k) {
+  long i = ((k * k * MULT) << 20) >> 4;
+  if (i < 0)
+    i = -i;
+  return i;
 }

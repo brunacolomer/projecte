@@ -10,3 +10,6 @@ nat _M;
 nat _quants;
 
 node_hash::node_hash(const phone p, node_hash *seg = nullptr): _p(p), _seg(seg){}
+
+static long const MULT = 31415926;
+static long h(int k);
