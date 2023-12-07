@@ -2,11 +2,11 @@
 
 /* Construeix un call_registry buit. */
 call_registry::call_registry() throw(error){
-    _M = ???;
+    _M = 13;
     _quants = 0;
     _taula = new node_hash *[_M];
     for(int i = 0; i<_M; ++i){
-        _taula[i] = nullptr;
+        _taula[i] = NULL;
     }
 }
 
@@ -20,8 +20,8 @@ call_registry::call_registry(const call_registry& R) throw(error){
     }
 }
 
-call_registry::call_registry& operator=(const call_registry& R) throw(error){
-    call_registry aux = call_registry(R)
+call_registry& call_registry::operator=(const call_registry& R) throw(error){
+    call_registry aux = call_registry(R);
     *this = aux;
     return *this;
 }
@@ -36,18 +36,18 @@ estava prèviament en el call_registry afegeix una nova entrada amb
 el número de telèfon donat, l'string buit com a nom i el comptador a 1. */
 void call_registry::registra_trucada(nat num) throw(error){
     int pos = h(num) % _M;
-    if (_taula[pos]==nullptr){
+    if (_taula[pos]==NULL){
         node_hash *element = new node_hash;
         phone telefon(num,"", 1);
         element->_p = telefon;
-        element->_seg=nullptr;
+        element->_seg=NULL;
         _taula[pos] = element;
         _quants++;
     } else{
         bool trobat  =false;
         node_hash * element = _taula[pos];
-        node_hash * ant = nullptr;
-        while(element!=nullptr and not trobat and element->_k<=k){
+        node_hash * ant = NULL;
+        while(element!=NULL and not trobat and element->_p.numero()<=num){
             if(element->_p.numero()==num) trobat = true;
             else {
                 ant = element;
@@ -58,7 +58,7 @@ void call_registry::registra_trucada(nat num) throw(error){
             phone telefon(num,"", 1);
             nou->_p = telefon;
             nou->_seg=element;
-            if(ant == nullptr) _taula[pos] = nou;
+            if(ant == NULL) _taula[pos] = nou;
             else ant->_seg = nou;
             _quants++;
         } else { //Si hi ha el telefon al call registry freq++
@@ -76,8 +76,8 @@ void call_registry::assigna_nom(nat num, const string& name) throw(error){
     int pos = (h(num))%_M;
     bool trobat  =false;
     node_hash * element = _taula[pos];
-    node_hash * ant = nullptr;
-    while(element!=nullptr and not trobat and element->_p.numero()<=num){
+    node_hash * ant = NULL;
+    while(element!=NULL and not trobat and element->_p.numero()<=num){
         if(element->_p.numero()==num) trobat = true;
         else {
             ant = element;
@@ -93,9 +93,10 @@ void call_registry::assigna_nom(nat num, const string& name) throw(error){
         phone telefon(num,name, 0);
         nou->_p = telefon;
         nou->_seg=element;
-        if(ant == nullptr) _taula[pos] = nou;
+        if(ant == NULL) _taula[pos] = nou;
         else ant->_seg = nou;
         _quants++;
+    }
 }
 
 /* Elimina l'entrada corresponent al telèfon el número de la qual es dóna.
@@ -104,15 +105,15 @@ void call_registry::elimina(nat num) throw(error){
     int pos = (h(num))%_M;
     bool trobat = false;
     node_hash * element = _taula[pos];
-    node_hash * ant = nullptr;
-    while(element!=nullptr and not trobat and element->_p.numero()<=num){
+    node_hash * ant = NULL;
+    while(element!=NULL and not trobat and element->_p.numero()<=num){
         if(element->_p.numero()==num) trobat = true;
         else {
             ant = element;
             element=element->_seg;
         }
     }if (trobat){
-        if(ant==nullptr){
+        if(ant==NULL){
             _taula[pos] = element;
         } else {
             ant->_seg = element->_seg;
@@ -127,8 +128,8 @@ bool call_registry::conte(nat num) const throw(){
     int pos = (h(num))%_M;
     bool trobat  =false;
     node_hash * element = _taula[pos];
-    while(element!=nullptr and not trobat and element->_k<=k){
-        if(element->_k==k) trobat = true;
+    while(element!=NULL and not trobat and element->_p.numero()<=num){
+        if(element->_p.numero()==num) trobat = true;
         else {
             element=element->_seg;
         }
@@ -145,8 +146,8 @@ string call_registry::nom(nat num) const throw(error){
     int pos = (h(num))%_M;
     bool trobat  =false;
     node_hash * element = _taula[pos];
-    while(element!=nullptr and not trobat and element->_k<=k){
-        if(element->_k==k) trobat = true;
+    while(element!=NULL and not trobat and element->_p.numero()<=num){
+        if(element->_p.numero()==num) trobat = true;
         else {
             element=element->_seg;
         }
@@ -165,8 +166,8 @@ nat call_registry::num_trucades(nat num) const throw(error){
     int pos = (h(num))%_M;
     bool trobat  =false;
     node_hash * element = _taula[pos];
-    while(element!=nullptr and not trobat and element->_k<=k){
-        if(element->_k==k) trobat = true;
+    while(element!=NULL and not trobat and element->_p.numero()<=num){
+        if(element->_p.numero()==num) trobat = true;
         else {
             element=element->_seg;
         }
@@ -192,12 +193,11 @@ nom no nul sobre un vector de phone.
 Comprova que tots els noms dels telèfons siguin diferents; 
 es produeix un error en cas contrari. */
 void call_registry::dump(vector<phone>& V) const throw(error){
-    vector v(_quants);
-    int j=0
+    int j=0;
     for(int i = 0; i<_M; ++i){
         node_hash * element = _taula[i];
-        while(element!=nullptr){
-            v[j] = element->_p;
+        while(element!=NULL){
+            V[j] = element->_p;
             element = element->_seg;
             j++;
         }
@@ -210,4 +210,4 @@ long call_registry::h(int k) {
   if (i < 0)
     i = -i;
   return i;
-}
+};
