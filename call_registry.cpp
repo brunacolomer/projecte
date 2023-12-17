@@ -36,18 +36,18 @@ estava prèviament en el call_registry afegeix una nova entrada amb
 el número de telèfon donat, l'string buit com a nom i el comptador a 1. */
 void call_registry::registra_trucada(nat num) throw(error){
     int pos = h(num) % _M;
-    if (_taula[pos]==NULL){
+    if (_taula[pos]==nullptr){
         node_hash *element = new node_hash;
         phone telefon(num,"", 1);
         element->_p = telefon;
-        element->_seg=NULL;
+        element->_seg=nullptr;
         _taula[pos] = element;
         _quants++;
     } else{
-        bool trobat  =false;
+        bool trobat = false;
         node_hash * element = _taula[pos];
-        node_hash * ant = NULL;
-        while(element!=NULL and not trobat and element->_p.numero()<=num){
+        node_hash * ant = nullptr;
+        while(element != nullptr and not trobat and element->_p.numero()<=num){
             if(element->_p.numero()==num) trobat = true;
             else {
                 ant = element;
@@ -57,8 +57,9 @@ void call_registry::registra_trucada(nat num) throw(error){
             node_hash * nou = new node_hash;
             phone telefon(num,"", 1);
             nou->_p = telefon;
-            nou->_seg=element;
-            if(ant == NULL) _taula[pos] = nou;
+            nou->_seg = element;
+            element->_seg = nullptr;
+            if(ant == nullptr) _taula[pos] = nou;
             else ant->_seg = nou;
             _quants++;
         } else { //Si hi ha el telefon al call registry freq++
@@ -211,3 +212,31 @@ long call_registry::h(int k) {
     i = -i;
   return i;
 };
+
+float call_registry::factor_de_carrega() const{
+    float fc = ((float)this->_quants/(float)this->_M);
+    return fc;
+}
+
+void call_registry::redispersió(float fc){
+    if(fc > 0.8){
+        call_registry aux(2*(this->_M)+1);
+        for(int i=0; i<_M; ++i){
+            node_hash n = _taula[i];
+            while(n != nullptr){
+                aux.registra_trucada(n._p);
+            }
+        }
+    }
+    else if(fc < 0.3){
+        call_registry aux((this->_M+1)/2);
+        for(int i=0; i<_M; ++i){
+            node_hash n = _taula[i];
+            while(n != nullptr){
+                aux.registra_trucada(n._p);
+            }
+        }
+    }
+    swap(_M, aux._M);
+    swap(_taula, aux._taula);
+}

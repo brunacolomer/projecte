@@ -14,3 +14,5 @@ nat _quants;
 
 static long const MULT = 31415926;
 static long h(int k);
+void redispersió(float fc);
+float factor_de_carrega() const;
