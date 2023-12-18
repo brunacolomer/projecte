@@ -6,7 +6,7 @@ call_registry::call_registry() throw(error){
     _quants = 0;
     _taula = new node_hash *[_M];
     for(int i = 0; i<_M; ++i){
-        _taula[i] = NULL;
+        _taula[i] = nullptr;
     }
 }
 
@@ -36,32 +36,36 @@ estava prèviament en el call_registry afegeix una nova entrada amb
 el número de telèfon donat, l'string buit com a nom i el comptador a 1. */
 void call_registry::registra_trucada(nat num) throw(error){
     int pos = h(num) % _M;
-    if (_taula[pos]==nullptr){
+    if (_taula[pos] == NULL){
         node_hash *element = new node_hash;
         phone telefon(num,"", 1);
         element->_p = telefon;
-        element->_seg=nullptr;
+        element->_seg = NULL;
         _taula[pos] = element;
         _quants++;
+        float fc = factor_de_carrega();
+        if(fe > 0.8) redispersió(fc);
     } else{
         bool trobat = false;
-        node_hash * element = _taula[pos];
-        node_hash * ant = nullptr;
-        while(element != nullptr and not trobat and element->_p.numero()<=num){
+        node_hash *element = _taula[pos];
+        node_hash *ant = NULL;
+        while(element != NULL and not trobat and element->_p.numero()<=num){
             if(element->_p.numero()==num) trobat = true;
             else {
                 ant = element;
                 element=element->_seg;
             }
         }if(not trobat){
-            node_hash * nou = new node_hash;
+            node_hash *nou = new node_hash;
             phone telefon(num,"", 1);
             nou->_p = telefon;
             nou->_seg = element;
-            element->_seg = nullptr;
-            if(ant == nullptr) _taula[pos] = nou;
+            element->_seg = NULL;
+            if(ant == NULL) _taula[pos] = nou;
             else ant->_seg = nou;
             _quants++;
+            float fc = factor_de_carrega();
+            if(fe > 0.8) redispersió(fc);
         } else { //Si hi ha el telefon al call registry freq++
             ++(element->_p);
         }
@@ -75,14 +79,14 @@ de trucades a 0.
 Si el número existia prèviament, se li assigna el nom donat. */
 void call_registry::assigna_nom(nat num, const string& name) throw(error){
     int pos = (h(num))%_M;
-    bool trobat  =false;
+    bool trobat  = false;
     node_hash * element = _taula[pos];
-    node_hash * ant = NULL;
-    while(element!=NULL and not trobat and element->_p.numero()<=num){
-        if(element->_p.numero()==num) trobat = true;
+    node_hash * ant = nullptr;
+    while(element != nullptr and not trobat and element->_p.numero() <= num){
+        if(element->_p.numero() == num) trobat = true;
         else {
             ant = element;
-            element=element->_seg;
+            element = element->_seg;
         }
     } if(trobat) {
         int f = element->_p.frequencia();
@@ -90,13 +94,15 @@ void call_registry::assigna_nom(nat num, const string& name) throw(error){
         element->_p = nou;
     }
     else {
-        node_hash * nou = new node_hash;
+        node_hash *nou = new node_hash;
         phone telefon(num,name, 0);
         nou->_p = telefon;
-        nou->_seg=element;
-        if(ant == NULL) _taula[pos] = nou;
+        nou->_seg = element; 
+        if(ant == nullptr) _taula[pos] = nou;
         else ant->_seg = nou;
         _quants++;
+        float fc = factor_de_carrega();
+        if(fe > 0.8) redispersió(fc);
     }
 }
 
@@ -105,9 +111,9 @@ Es produeix un error si el número no estava present. */
 void call_registry::elimina(nat num) throw(error){
     int pos = (h(num))%_M;
     bool trobat = false;
-    node_hash * element = _taula[pos];
-    node_hash * ant = NULL;
-    while(element!=NULL and not trobat and element->_p.numero()<=num){
+    node_hash *element = _taula[pos];
+    node_hash *ant = NULL;
+    while(element != NULL and not trobat and element->_p.numero()<=num){
         if(element->_p.numero()==num) trobat = true;
         else {
             ant = element;
@@ -119,6 +125,9 @@ void call_registry::elimina(nat num) throw(error){
         } else {
             ant->_seg = element->_seg;
             delete element;
+            --_quants;
+            float fc = factor_de_carrega();
+            if(fe > 0.8) redispersió(fc);
         }
     }
 }
@@ -216,7 +225,7 @@ long call_registry::h(int k) {
 float call_registry::factor_de_carrega() const{
     float fc = ((float)this->_quants/(float)this->_M);
     return fc;
-}
+};
 
 void call_registry::redispersió(float fc){
     if(fc > 0.8){
@@ -239,4 +248,4 @@ void call_registry::redispersió(float fc){
     }
     swap(_M, aux._M);
     swap(_taula, aux._taula);
-}
+};
