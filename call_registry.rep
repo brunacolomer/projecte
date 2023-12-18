@@ -16,3 +16,6 @@ static long const MULT = 31415926;
 static long h(int k);
 void redispersió(float fc);
 float factor_de_carrega() const;
+void ordena(vector<string>& V) const;
+void parteix(vector<string>& a, vector<string>& b) const;
+vector<string> fusiona(const vector<string>& a, const vector<string>& b) const; 

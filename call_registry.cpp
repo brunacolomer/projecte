@@ -2,7 +2,7 @@
 
 /* Construeix un call_registry buit. */
 call_registry::call_registry() throw(error){
-    _M = 13;
+    _M = 50;
     _quants = 0;
     _taula = new node_hash *[_M];
     for(int i = 0; i<_M; ++i){
@@ -21,8 +21,12 @@ call_registry::call_registry(const call_registry& R) throw(error){
 }
 
 call_registry& call_registry::operator=(const call_registry& R) throw(error){
-    call_registry aux = call_registry(R);
-    *this = aux;
+    _M = R._M;
+    _quants = R._quants;
+    _taula = new node_hash *[_M];
+    for(int i = 0; i<_M; ++i){
+        _taula[i] = R._taula[i];
+    }
     return *this;
 }
 
@@ -60,7 +64,6 @@ void call_registry::registra_trucada(nat num) throw(error){
             phone telefon(num,"", 1);
             nou->_p = telefon;
             nou->_seg = element;
-            element->_seg = NULL;
             if(ant == NULL) _taula[pos] = nou;
             else ant->_seg = nou;
             _quants++;
@@ -121,7 +124,9 @@ void call_registry::elimina(nat num) throw(error){
         }
     }if (trobat){
         if(ant==NULL){
-            _taula[pos] = element;
+            _taula[pos] = element->_seg;
+            delete element;
+            --_quants;
         } else {
             ant->_seg = element->_seg;
             delete element;
@@ -129,7 +134,7 @@ void call_registry::elimina(nat num) throw(error){
             float fc = factor_de_carrega();
             if(fc > 0.8) redispersió(fc);
         }
-    }
+    } else throw error(ErrNumeroInexistent);
 }
 
 /* Retorna cert si i només si el call_registry conté un 
@@ -203,15 +208,32 @@ nom no nul sobre un vector de phone.
 Comprova que tots els noms dels telèfons siguin diferents; 
 es produeix un error en cas contrari. */
 void call_registry::dump(vector<phone>& V) const throw(error){
-    int j=0;
+    nat j=0;
+    vector<string> noms;
     for(int i = 0; i<_M; ++i){
         node_hash * element = _taula[i];
         while(element!=NULL){
-            V[j] = element->_p;
+            if(element->_p.nom()!=""){
+                noms.push_back(element->_p.nom());
+                V.push_back(element->_p);
+            }
             element = element->_seg;
-            j++;
+            
         }
-    }
+    } 
+    ordena(noms);
+    bool repetits = false;
+    if (noms.size()>1){
+        while(not repetits and j<noms.size()-1){
+            if(noms[j]==noms[j+1]) repetits =true;
+            j++;
+        } if (repetits) {
+            throw error(ErrNomRepetit);
+            for(unsigned int i =0; i<V.size();i++){
+                V.pop_back();
+            }
+    }       
+}
 }
 
 // Mètodes privats
@@ -254,3 +276,55 @@ void call_registry::redispersió(float fc){
     
     
 };
+
+void call_registry::ordena(vector<string>& V) const{
+    if(V.size()<2) return;
+    vector<string> a = V;
+    vector<string> b;
+    parteix(a,b);
+    ordena(a);
+    ordena(b);
+    V = fusiona(a,b);
+};
+
+void call_registry::parteix(vector<string>& a, vector<string>& b) const{
+    //cout << "parteix" <<endl;
+    int  mida = int(a.size()/2);
+    int n = int(a.size()) -1;
+    for(unsigned int i = n; i >= mida; i--){
+        b.push_back(a[i]);
+        a.pop_back();
+    }
+    //cout << size(b) << endl;
+}
+
+vector<string> call_registry::fusiona(const vector<string>& a, const vector<string>& b) const{
+    //cout << "fusiona" <<endl;
+    vector<string> res;
+    int sa = int(a.size());
+    int sb = int(b.size());
+    //cout << sb << endl;
+    int ia = 0;
+    int ib = 0;
+    while((ia<sa) and (ib<sb)){
+        //cout << "m" << endl;
+        if(a[ia]<b[ib]) {
+            //cout << a[ia] << endl;
+            res.push_back(a[ia]);
+            ia++;
+        } else {
+            res.push_back(b[ib]);
+            ib++;
+        }
+    }
+    while(ia<sa){
+        //cout << "hola";
+        res.push_back(a[ia]);
+        ia++;
+    }
+
+    while(ib<sb){
+        res.push_back(b[ib]);
+        ib++;
+    } return res;
+}

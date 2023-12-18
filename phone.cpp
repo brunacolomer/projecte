@@ -22,8 +22,9 @@ phone::phone(const phone& T) throw(error) {
 
 
 phone& phone::operator=(const phone& T) throw(error){
-    phone aux(T);
-    *this = aux;
+    name_phone = T.name_phone;
+    number = T.number;
+    freq = T.freq;
     return *this;
 }
 
@@ -69,7 +70,7 @@ La resta d'operadors es defineixen consistentment respecte a >. */
 
 bool phone::operator==(const phone& T) const throw(){
     bool igual = false;
-    if(freq == T.freq) igual = true;
+    if(freq == T.freq and name_phone==T.name_phone) igual = true;
     return igual;
 }
 
@@ -86,7 +87,10 @@ bool phone::operator<(const phone& T) const throw(){
 }
 
 bool phone::operator>(const phone& T) const throw(){
-    return not (*this<T);
+    bool gran = false;
+    if (freq>T.freq) gran = true;
+    else if(freq == T.freq and name_phone>T.name_phone) gran = true;
+    return gran;
 }
 
 bool phone::operator<=(const phone& T) const throw(){
@@ -106,7 +110,7 @@ static const int  ErrNomIncorrecte = 11;
 
 
 // g++ phone.cpp -o phone.e -O0 -g -Wall -Wextra -Werror -Wno-sign-compare -std=c++14 -ansi -I /home/bruna/ESIN/projecte/incl -lesin
-
+/*
 int main() {
     // Your program logic here
     phone aux1(645345324,"Jaume",0);
@@ -115,4 +119,4 @@ int main() {
     if(aux2==aux1) cout << "Funciona!!!!!" << endl;
     cout << aux1.numero() << endl;
     return 0;
-}
+}*/
