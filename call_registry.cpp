@@ -6,7 +6,7 @@ call_registry::call_registry() throw(error){
     _quants = 0;
     _taula = new node_hash *[_M];
     for(int i = 0; i<_M; ++i){
-        _taula[i] = nullptr;
+        _taula[i] = NULL;
     }
 }
 
@@ -44,7 +44,7 @@ void call_registry::registra_trucada(nat num) throw(error){
         _taula[pos] = element;
         _quants++;
         float fc = factor_de_carrega();
-        if(fe > 0.8) redispersió(fc);
+        if(fc > 0.8) redispersió(fc);
     } else{
         bool trobat = false;
         node_hash *element = _taula[pos];
@@ -65,7 +65,7 @@ void call_registry::registra_trucada(nat num) throw(error){
             else ant->_seg = nou;
             _quants++;
             float fc = factor_de_carrega();
-            if(fe > 0.8) redispersió(fc);
+            if(fc > 0.8) redispersió(fc);
         } else { //Si hi ha el telefon al call registry freq++
             ++(element->_p);
         }
@@ -81,8 +81,8 @@ void call_registry::assigna_nom(nat num, const string& name) throw(error){
     int pos = (h(num))%_M;
     bool trobat  = false;
     node_hash * element = _taula[pos];
-    node_hash * ant = nullptr;
-    while(element != nullptr and not trobat and element->_p.numero() <= num){
+    node_hash * ant = NULL;
+    while(element != NULL and not trobat and element->_p.numero() <= num){
         if(element->_p.numero() == num) trobat = true;
         else {
             ant = element;
@@ -98,11 +98,11 @@ void call_registry::assigna_nom(nat num, const string& name) throw(error){
         phone telefon(num,name, 0);
         nou->_p = telefon;
         nou->_seg = element; 
-        if(ant == nullptr) _taula[pos] = nou;
+        if(ant == NULL) _taula[pos] = nou;
         else ant->_seg = nou;
         _quants++;
         float fc = factor_de_carrega();
-        if(fe > 0.8) redispersió(fc);
+        if(fc > 0.8) redispersió(fc);
     }
 }
 
@@ -127,7 +127,7 @@ void call_registry::elimina(nat num) throw(error){
             delete element;
             --_quants;
             float fc = factor_de_carrega();
-            if(fe > 0.8) redispersió(fc);
+            if(fc > 0.8) redispersió(fc);
         }
     }
 }
@@ -229,23 +229,28 @@ float call_registry::factor_de_carrega() const{
 
 void call_registry::redispersió(float fc){
     if(fc > 0.8){
-        call_registry aux(2*(this->_M)+1);
+        //call_registry aux(2*(this->_M)+1);
+        call_registry aux;
+        aux._M =2*(this->_M)+1;
         for(int i=0; i<_M; ++i){
-            node_hash n = _taula[i];
-            while(n != nullptr){
-                aux.registra_trucada(n._p);
+            node_hash *n = _taula[i];
+            while(n != NULL){
+                aux.registra_trucada(n->_p.numero());
             }
-        }
+        }swap(_M, aux._M);
+        swap(_taula, aux._taula);
     }
     else if(fc < 0.3){
-        call_registry aux((this->_M+1)/2);
+        call_registry aux;
+        aux._M = ((this->_M+1)/2);
         for(int i=0; i<_M; ++i){
-            node_hash n = _taula[i];
-            while(n != nullptr){
-                aux.registra_trucada(n._p);
+            node_hash *n = _taula[i];
+            while(n != NULL){
+                aux.registra_trucada(n->_p.numero());
             }
-        }
+        }swap(_M, aux._M);
+        swap(_taula, aux._taula);
     }
-    swap(_M, aux._M);
-    swap(_taula, aux._taula);
+    
+    
 };
