@@ -2,11 +2,11 @@
 
 /* Construeix un call_registry buit. */
 call_registry::call_registry() throw(error){
-    _M = 50;
+    _M = 4;
     _quants = 0;
     _taula = new node_hash *[_M];
     for(int i = 0; i<_M; ++i){
-        _taula[i] = NULL;
+        _taula[i] = nullptr;
     }
 }
 
@@ -16,7 +16,26 @@ call_registry::call_registry(const call_registry& R) throw(error){
     _quants = R._quants;
     _taula = new node_hash *[_M];
     for(int i = 0; i<_M; ++i){
-        _taula[i] = R._taula[i];
+        node_hash *n = R._taula[i];
+        node_hash *ant = nullptr;
+        _taula[i] = nullptr;
+        while(n!=nullptr){
+            if (ant!=nullptr){
+                node_hash *nou = new node_hash;
+                nou->_p = n->_p;
+                nou->_seg = nullptr;
+                ant->_seg = nou;
+                ant = nou;
+
+            } else {
+                node_hash *nou = new node_hash;
+                nou->_p = n->_p;
+                nou->_seg = nullptr;
+                ant = nou;
+                _taula[i] = ant;
+            }n = n->_seg;
+        }
+        
     }
 }
 
@@ -25,7 +44,27 @@ call_registry& call_registry::operator=(const call_registry& R) throw(error){
     _quants = R._quants;
     _taula = new node_hash *[_M];
     for(int i = 0; i<_M; ++i){
-        _taula[i] = R._taula[i];
+        node_hash *n = R._taula[i];
+        node_hash *ant = nullptr;
+        _taula[i] = nullptr;
+        while(n!=nullptr){
+            if (ant!=nullptr){
+                node_hash *nou = new node_hash;
+                nou->_p = n->_p;
+                nou->_seg = nullptr;
+                ant->_seg = nou;
+                ant = nou;
+                
+
+            } else {
+                node_hash *nou = new node_hash;
+                nou->_p = n->_p;
+                nou->_seg = nullptr;
+                ant = nou;
+                _taula[i] = ant;
+            } n = n->_seg;
+        }
+        
     }
     return *this;
 }
@@ -40,11 +79,11 @@ estava prèviament en el call_registry afegeix una nova entrada amb
 el número de telèfon donat, l'string buit com a nom i el comptador a 1. */
 void call_registry::registra_trucada(nat num) throw(error){
     int pos = h(num) % _M;
-    if (_taula[pos] == NULL){
+    if (_taula[pos] == nullptr){
         node_hash *element = new node_hash;
         phone telefon(num,"", 1);
         element->_p = telefon;
-        element->_seg = NULL;
+        element->_seg = nullptr;
         _taula[pos] = element;
         _quants++;
         float fc = factor_de_carrega();
@@ -52,8 +91,8 @@ void call_registry::registra_trucada(nat num) throw(error){
     } else{
         bool trobat = false;
         node_hash *element = _taula[pos];
-        node_hash *ant = NULL;
-        while(element != NULL and not trobat and element->_p.numero()<=num){
+        node_hash *ant = nullptr;
+        while(element != nullptr and not trobat and element->_p.numero()<=num){
             if(element->_p.numero()==num) trobat = true;
             else {
                 ant = element;
@@ -64,7 +103,7 @@ void call_registry::registra_trucada(nat num) throw(error){
             phone telefon(num,"", 1);
             nou->_p = telefon;
             nou->_seg = element;
-            if(ant == NULL) _taula[pos] = nou;
+            if(ant == nullptr) _taula[pos] = nou;
             else ant->_seg = nou;
             _quants++;
             float fc = factor_de_carrega();
@@ -84,8 +123,8 @@ void call_registry::assigna_nom(nat num, const string& name) throw(error){
     int pos = (h(num))%_M;
     bool trobat  = false;
     node_hash * element = _taula[pos];
-    node_hash * ant = NULL;
-    while(element != NULL and not trobat and element->_p.numero() <= num){
+    node_hash * ant = nullptr;
+    while(element != nullptr and not trobat and element->_p.numero() <= num){
         if(element->_p.numero() == num) trobat = true;
         else {
             ant = element;
@@ -101,7 +140,7 @@ void call_registry::assigna_nom(nat num, const string& name) throw(error){
         phone telefon(num,name, 0);
         nou->_p = telefon;
         nou->_seg = element; 
-        if(ant == NULL) _taula[pos] = nou;
+        if(ant == nullptr) _taula[pos] = nou;
         else ant->_seg = nou;
         _quants++;
         float fc = factor_de_carrega();
@@ -115,24 +154,28 @@ void call_registry::elimina(nat num) throw(error){
     int pos = (h(num))%_M;
     bool trobat = false;
     node_hash *element = _taula[pos];
-    node_hash *ant = NULL;
-    while(element != NULL and not trobat and element->_p.numero()<=num){
+    node_hash *ant = nullptr;
+    while(element != nullptr and not trobat and element->_p.numero()<=num){
         if(element->_p.numero()==num) trobat = true;
         else {
             ant = element;
             element=element->_seg;
         }
     }if (trobat){
-        if(ant==NULL){
+        if(ant==nullptr){
             _taula[pos] = element->_seg;
             delete element;
             --_quants;
+            float fc = factor_de_carrega();
+            //cout << fc << endl;
+            if(fc < 0.3) redispersió(fc);
         } else {
             ant->_seg = element->_seg;
             delete element;
             --_quants;
             float fc = factor_de_carrega();
-            if(fc > 0.8) redispersió(fc);
+            //cout << fc << endl;
+            if(fc < 0.3) redispersió(fc);
         }
     } else throw error(ErrNumeroInexistent);
 }
@@ -181,7 +224,7 @@ nat call_registry::num_trucades(nat num) const throw(error){
     int pos = (h(num))%_M;
     bool trobat  =false;
     node_hash * element = _taula[pos];
-    while(element!=NULL and not trobat and element->_p.numero()<=num){
+    while(element!=nullptr and not trobat and element->_p.numero()<=num){
         if(element->_p.numero()==num) trobat = true;
         else {
             element=element->_seg;
@@ -250,14 +293,20 @@ float call_registry::factor_de_carrega() const{
 };
 
 void call_registry::redispersió(float fc){
+    //cout << _M << endl;
     if(fc > 0.8){
         //call_registry aux(2*(this->_M)+1);
         call_registry aux;
         aux._M =2*(this->_M)+1;
+        aux._taula = new node_hash *[aux._M];
+        for(int i = 0; i<aux._M; ++i){
+            aux._taula[i] = nullptr;
+        }
         for(int i=0; i<_M; ++i){
             node_hash *n = _taula[i];
-            while(n != NULL){
-                aux.registra_trucada(n->_p.numero());
+            while(n != nullptr){
+                aux.afegeix_numero(n->_p);
+                n=n->_seg;
             }
         }swap(_M, aux._M);
         swap(_taula, aux._taula);
@@ -265,10 +314,15 @@ void call_registry::redispersió(float fc){
     else if(fc < 0.3){
         call_registry aux;
         aux._M = ((this->_M+1)/2);
+        aux._taula = new node_hash *[aux._M];
+        for(int i = 0; i<aux._M; ++i){
+            aux._taula[i] = nullptr;
+        }
         for(int i=0; i<_M; ++i){
             node_hash *n = _taula[i];
             while(n != NULL){
-                aux.registra_trucada(n->_p.numero());
+                aux.afegeix_numero(n->_p);
+                n=n->_seg;
             }
         }swap(_M, aux._M);
         swap(_taula, aux._taula);
@@ -328,3 +382,36 @@ vector<string> call_registry::fusiona(const vector<string>& a, const vector<stri
         ib++;
     } return res;
 }
+
+void call_registry::afegeix_numero(phone p){
+    int pos = h(p.numero()) % _M;
+    if (_taula[pos] == nullptr){
+        node_hash *element = new node_hash;
+        element->_p = p;
+        element->_seg = nullptr;
+        _taula[pos] = element;
+        _quants++;
+    } else{
+        bool trobat = false;
+        node_hash *element = _taula[pos];
+        node_hash *ant = nullptr;
+        while(element != nullptr and not trobat and element->_p.numero()<=p.numero()){
+            if(element->_p.numero()==p.numero()) trobat = true;
+            else {
+                ant = element;
+                element=element->_seg;
+            }
+        }if(not trobat){
+            node_hash *nou = new node_hash;
+            nou->_p = p;
+            nou->_seg = element;
+            if(ant == nullptr) _taula[pos] = nou;
+            else ant->_seg = nou;
+            _quants++;
+        } else { //Si hi ha el telefon al call registry freq++
+            ++(element->_p);
+        }
+    }
+}
+
+
