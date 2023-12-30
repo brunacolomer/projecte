@@ -1,5 +1,8 @@
 #include "easy_dial.hpp"
 
+//aixo no es pot pero ho poso de moment
+
+#include<algorithm>
 
 /* Construeix un easy_dial a partir de la 
 informació continguda en el call_registry donat. El
@@ -7,6 +10,14 @@ prefix en curs queda indefinit. */
 easy_dial::easy_dial(const call_registry& R) throw(error){
     vector<phone> v;
     R.dump(v);
+    sort(v.begin(), v.end());
+    //IDEA: creem easy_dial amb els telefons ja ordenats
+    // si marta es el que té mes frequencia sera com l'arrel (caracter buit)
+    // despres si per exemple el call registry conte : marta 6, joan 3, jou 1
+    // si poses j, automaticament et surt joan(j sera el fill esquerra)
+    //i j de per si conte joan(o el seu fill central nose encara)
+    //i el fill esquerra de fi de clau sera o i amb o ja tens jou.
+    //no se si igualment es massa poc eficient
     for(nat i=0; i<v.size(); i++){
         cout << v[i].nom() << endl;
     }
