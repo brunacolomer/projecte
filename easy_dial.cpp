@@ -4,7 +4,14 @@
 /* Construeix un easy_dial a partir de la 
 informació continguda en el call_registry donat. El
 prefix en curs queda indefinit. */
-easy_dial::easy_dial(const call_registry& R) throw(error){}
+easy_dial::easy_dial(const call_registry& R) throw(error){
+    vector<phone> v;
+    R.dump(v);
+    for(nat i=0; i<v.size(); i++){
+        cout << v[i].nom() << endl;
+    }
+
+}
 
 /* Tres grans. Constructor per còpia, operador d'assignació i destructor. */
 easy_dial::easy_dial(const easy_dial& D) throw(error){}
