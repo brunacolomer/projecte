@@ -1,8 +1,12 @@
 struct node {
     char _c;    // Símbol posició i-èssima de la clau
+    phone telf;
     node* _esq; // Fill esquerra, apunta a símbols mateixa posició formant un BST
     node* _cen; // Fill central, apunta a símbols següent posició
     node* _dre; // Fill dret, apunta a símbols mateixa posició formant un BST
+    node* _pare;
     node(const char &c, node* esq = NULL, node* cen = NULL, node* dre = NULL);
     };
     node* _arrel;
+    node* _actual;
+string _p // Prefix
