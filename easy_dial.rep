@@ -5,8 +5,13 @@ struct node {
     node* _cen; // Fill central, apunta a símbols següent posició
     node* _dre; // Fill dret, apunta a símbols mateixa posició formant un BST
     node* _pare;
-    node(const char &c, node* esq = NULL, node* cen = NULL, node* dre = NULL);
+    node();
     };
     node* _arrel;
     node* _actual;
-string _p // Prefix
+string _p; // Prefix
+void insereix(node * &n, nat i, const string &k, phone tel, node *pare);
+void ordena(vector<phone>& V) const;
+void parteix(vector<phone>& a, vector<phone>& b) const;
+vector<phone> fusiona(const vector<phone>& a, const vector<phone>& b) const;
+void cerca(node *n, char c);

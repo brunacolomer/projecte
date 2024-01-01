@@ -5,7 +5,8 @@
 informació continguda en el call_registry donat. El
 prefix en curs queda indefinit. */
 easy_dial::easy_dial(const call_registry& R) throw(error){
-   vector<phone> v = R.dump();
+   vector<phone> v;
+   R.dump(v);
 
    //ordena per freq
     ordena(v);
@@ -21,7 +22,7 @@ easy_dial::easy_dial(const call_registry& R) throw(error){
 }
 
 
-easy_dial::insereix(node& *n, nat i, const string &k, phone tel, node *pare){
+void easy_dial::insereix(node * &n, nat i, const string &k, phone tel, node *pare){
     if(n==nullptr){
         node * nou = new node;
         nou->telf = tel;
@@ -59,13 +60,14 @@ easy_dial::insereix(node& *n, nat i, const string &k, phone tel, node *pare){
 
 /* Tres grans. Constructor per còpia, operador d'assignació i destructor. */
 easy_dial::easy_dial(const easy_dial& D) throw(error){}
-easy_dial& easy_dial::operator=(const easy_dial& D) throw(error){}
+easy_dial& easy_dial::operator=(const easy_dial& D) throw(error){
+}
 easy_dial::~easy_dial() throw(){}
 
 /* Inicialitza el prefix en curs a buit. Retorna el nom de F(S, '');
 si F (S, '') no existeix llavors retorna l'string buit. */
 string easy_dial::inici() throw(){
-    _p='';
+    _p="";
     _actual = _arrel;
     return _arrel->telf.nom();
 }
@@ -87,10 +89,10 @@ string easy_dial::seguent(char c) throw(error){
 
 void easy_dial::cerca(node *n, char c){
      
-    if (n->_c == k[i]){
+    if (n->_c == c){
         _actual = n;
     }
-    else if (k[i]<n->_c){
+    else if (c<n->_c){
         cerca(n->_esq, c);
     }
     else {
@@ -105,7 +107,7 @@ Es produeix un error si p fos buida i si es fa que el prefix en curs
 quedi indefinit. Òbviament, també es produeix un error 
 si p fos indefinit. */
 string easy_dial::anterior() throw(error){
-    _actual = _actual->pare;
+    _actual = _actual->_pare;
     _p.pop_back();
     return _actual->telf.nom();
 }
@@ -138,10 +140,10 @@ static const int  ErrNoExisteixTelefon  = 32;
 static const int  ErrNoHiHaAnterior     = 33;
 
 
-void easy_dial::ordena(vector<nat>& V) const{
+void easy_dial::ordena(vector<phone>& V) const{
     if(V.size()<2) return;
-    vector<nat> a = V;
-    vector<nat> b;
+    vector<phone> a = V;
+    vector<phone> b;
     parteix(a,b);
     ordena(a);
     ordena(b);
@@ -189,3 +191,5 @@ vector<phone> easy_dial::fusiona(const vector<phone>& a, const vector<phone>& b)
         ib++;
     } return res;
 }
+
+easy_dial::node::node () : _esq(nullptr), _dre(nullptr){};
