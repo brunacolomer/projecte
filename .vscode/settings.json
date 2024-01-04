@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.rep": "cpp",
+        "iostream": "cpp",
+        "error": "cpp"
+    }
+}
