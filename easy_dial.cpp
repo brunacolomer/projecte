@@ -4,11 +4,12 @@
 /* Construeix un easy_dial a partir de la 
 informació continguda en el call_registry donat. El
 prefix en curs queda indefinit. */
-easy_dial::easy_dial(const call_registry& R) throw(error) : _arrel(nullptr){ 
+easy_dial::easy_dial(const call_registry& R) throw(error) : _arrel(nullptr), _actual(nullptr){ 
     
    // _arrel=nullptr;
-    _actual = nullptr;
+
  
+   // _anterior = nullptr;
     freqtotal=0;
 
     _p = false;
@@ -18,38 +19,34 @@ easy_dial::easy_dial(const call_registry& R) throw(error) : _arrel(nullptr){
 
    //ordena per freq
     ordena(v);
-
-   //recorrem el vector
-   // depenent de si
-   //_arrel=nullptr;
-   ///*
-   //freqtotal = 0;
    
    for(int i=0; i<v.size(); i++){
     string nom = v[i].nom();
     //dins d'insereix que busca i=0; nom[i]; ++i
+    //cout << v[i].nom() << endl;
     nat j=0;
-    node *pare = nullptr;
-    _arrel = insereix(_arrel, j, nom, v[i], pare);
+    //node *pare = nullptr;
+    _arrel = insereix(_arrel, j, nom+'\0', v[i]);
    }
+   //cout << _arrel->_dre->_c << endl;
 }
 
 
-easy_dial::node* easy_dial::insereix(node *n, nat i, const string &k, phone tel, node *pare){
+easy_dial::node* easy_dial::insereix(node *n, nat i, const string &k, phone tel){
     if(i>=k.size()) return n;
     if(n==nullptr){
         n = new node(k[i],tel);
-        n->_pare = pare;
+        //n->_pare = pare;
         freqtotal+=tel.frequencia();
     }
     else if (n->_c == k[i]){
-        n->_cen=insereix(n->_cen, i+1, k, tel, n);
+        n->_cen=insereix(n->_cen, i+1, k, tel);
     }
     else if (k[i]<n->_c){
-        n->_esq=insereix(n->_esq, i, k, tel, n);
+        n->_esq=insereix(n->_esq, i, k, tel);
     }
     else {
-        n->_dre=insereix(n->_dre, i, k, tel, n);
+        n->_dre=insereix(n->_dre, i, k, tel);
     } return n;
 }
 
@@ -104,9 +101,10 @@ string easy_dial::inici() throw(){
     _actual = _arrel;
     //_anterior = _arrel;
     string nom;
-    if(_actual==nullptr) 
+    if(_actual==nullptr) {
         nom = "";
-    else 
+    }
+    else
         nom = _arrel->_telf.nom();
     return nom;
 }
@@ -127,24 +125,14 @@ string easy_dial::seguent(char c) throw(error){
         throw error(ErrPrefixIndef);
     }
     else{
+        //cout << "holi" << endl;
     //_anterior = _actual;
-    _actual = cercador(_actual, c);
+    if(_actual==_arrel)
+        _actual = cercador(_actual, c);
+    else
+        _actual = cercador(_actual->_cen, c);
     if(_actual==nullptr) return "";
     return _actual->_telf.nom();
-    }
-}
-
-void easy_dial::cerca(node *n, char c){
-    if (n!=nullptr){
-        if (n->_c == c){
-            _actual = n->_cen;
-        }
-        else if (c<n->_c){
-            cerca(n->_esq, c);
-        }
-        else {
-            cerca(n->_dre, c);
-        }
     }
 }
 
@@ -161,7 +149,7 @@ string easy_dial::anterior() throw(error){
         throw error(ErrNoHiHaAnterior);
     }
 
-    if(_actual->_pare==nullptr) throw error(ErrNoHiHaAnterior);
+    //if(_actual->_pare==nullptr) throw error(ErrNoHiHaAnterior);
     
    // _actual = _anterior;
     //_p.pop_back();
@@ -206,13 +194,14 @@ easy_dial::node* easy_dial::cercador(node *n, char c) const{
             return n;
         }
         else if (c<n->_c){
-            cercador(n->_esq, c);
+            n = cercador(n->_esq, c);
         }
-        else {
-            cercador(n->_dre, c);
+        else if(c>n->_c){
+            n = cercador(n->_dre, c);
         }
+        
     }
-    return nullptr;
+    return n;
 }
 
 /* Retorna el número mitjà de pulsacions necessàries para obtenir un
@@ -279,7 +268,7 @@ vector<phone> easy_dial::fusiona(const vector<phone>& a, const vector<phone>& b)
     int ib = 0;
     while((ia<sa) and (ib<sb)){
         //cout << "m" << endl;
-        if(a[ia]<b[ib]) {
+        if(a[ia]>b[ib]) {
             //cout << a[ia] << endl;
             res.push_back(a[ia]);
             ia++;
@@ -300,4 +289,4 @@ vector<phone> easy_dial::fusiona(const vector<phone>& a, const vector<phone>& b)
     } return res;
 }
 
-easy_dial::node::node (const char &c, const phone &telf, node* esq, node* cen, node* dre , node* pare) : _c(c), _telf(telf), _esq(esq),_cen(cen), _dre(dre), _pare(pare){};
+easy_dial::node::node (const char &c, const phone &telf, node* esq, node* cen, node* dre ) : _c(c), _telf(telf), _esq(esq),_cen(cen), _dre(dre){};
