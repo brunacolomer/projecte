@@ -6,10 +6,12 @@ struct node {
     node* _dre; // Fill dret, apunta a símbols mateixa posició formant un BST
     node* _pare;
     node(const char &c, const phone &telf, node* esq = nullptr, node* cen = nullptr, node* dre = nullptr, node* pare = nullptr);
-    };
+};
+
 node* _arrel;
 node* _actual;
-//string _p; // Prefix
+//node* _anterior;
+bool _p; // Prefix
 nat freqtotal;
 node* insereix(node *n, nat i, const string &k, phone tel, node *pare);
 void ordena(vector<phone>& V) const;

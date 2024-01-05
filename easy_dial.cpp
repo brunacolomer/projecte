@@ -4,10 +4,14 @@
 /* Construeix un easy_dial a partir de la 
 informació continguda en el call_registry donat. El
 prefix en curs queda indefinit. */
-easy_dial::easy_dial(const call_registry& R) throw(error){ 
-    _arrel=nullptr;
-    _actual=nullptr;
+easy_dial::easy_dial(const call_registry& R) throw(error) : _arrel(nullptr){ 
+    
+   // _arrel=nullptr;
+    _actual = nullptr;
+ 
     freqtotal=0;
+
+    _p = false;
 
    vector<phone> v;
    R.dump(v);
@@ -18,15 +22,16 @@ easy_dial::easy_dial(const call_registry& R) throw(error){
    //recorrem el vector
    // depenent de si
    //_arrel=nullptr;
-   /*
+   ///*
    //freqtotal = 0;
+   
    for(int i=0; i<v.size(); i++){
     string nom = v[i].nom();
     //dins d'insereix que busca i=0; nom[i]; ++i
     nat j=0;
     node *pare = nullptr;
     _arrel = insereix(_arrel, j, nom, v[i], pare);
-   }*/
+   }
 }
 
 
@@ -54,6 +59,7 @@ easy_dial::easy_dial(const easy_dial& D) throw(error){
     freqtotal = D.freqtotal;
     _arrel = copia_nodes(D._arrel);
     _actual = nullptr;
+    //_anterior = D._anterior;
 }
 
 easy_dial::node* easy_dial::copia_nodes(node* m) {
@@ -74,6 +80,7 @@ easy_dial& easy_dial::operator=(const easy_dial& D) throw(error){
     freqtotal = D.freqtotal;
     _arrel = copia_nodes(D._arrel);
     _actual = nullptr;
+    //_anterior = D._anterior;
     return *this;
 }
 
@@ -81,7 +88,7 @@ easy_dial::~easy_dial() throw(){
     esborra_nodes(_arrel);
 }
 
-void easy_dial::esborra_nodes(easy_dial::node* m) {
+void easy_dial::esborra_nodes(node* m) {
   if (m != nullptr) {
     esborra_nodes(m->_esq);
     esborra_nodes(m->_dre);
@@ -93,8 +100,9 @@ void easy_dial::esborra_nodes(easy_dial::node* m) {
 /* Inicialitza el prefix en curs a buit. Retorna el nom de F(S, '');
 si F (S, '') no existeix llavors retorna l'string buit. */
 string easy_dial::inici() throw(){
-    //_p="";
+    _p=true;
     _actual = _arrel;
+    //_anterior = _arrel;
     string nom;
     if(_actual==nullptr) 
         nom = "";
@@ -114,10 +122,16 @@ Naturalment, es produeix un error si el prefix en curs inicial p
 fos indefinit. */
 string easy_dial::seguent(char c) throw(error){
     //_p += c;
-    if(_actual==nullptr) throw error(ErrPrefixIndef);
+    if(_actual==nullptr) {
+        _p = false;
+        throw error(ErrPrefixIndef);
+    }
+    else{
+    //_anterior = _actual;
     _actual = cercador(_actual, c);
     if(_actual==nullptr) return "";
     return _actual->_telf.nom();
+    }
 }
 
 void easy_dial::cerca(node *n, char c){
@@ -141,10 +155,15 @@ Es produeix un error si p fos buida i si es fa que el prefix en curs
 quedi indefinit. Òbviament, també es produeix un error 
 si p fos indefinit. */
 string easy_dial::anterior() throw(error){
-    if(_actual==nullptr) throw error(ErrPrefixIndef);
+    if(_p==false) throw error(ErrPrefixIndef);
+    if(_actual==nullptr) {
+        _p = false;
+        throw error(ErrNoHiHaAnterior);
+    }
+
     if(_actual->_pare==nullptr) throw error(ErrNoHiHaAnterior);
     
-    _actual = _actual->_pare;
+   // _actual = _anterior;
     //_p.pop_back();
     return _actual->_telf.nom();
 }
@@ -153,7 +172,7 @@ string easy_dial::anterior() throw(error){
 el prefix en curs. Es produeix un error si p és indefinit o si
 no existeix F(S, p). */
 nat easy_dial::num_telf() const throw(error){
-    //if(_p=="")throw error(ErrPrefixIndef);
+    if(_p==0)throw error(ErrPrefixIndef);
     if(_actual==nullptr) throw error(ErrNoExisteixTelefon);
     return _actual->_telf.numero();
 }
@@ -281,4 +300,4 @@ vector<phone> easy_dial::fusiona(const vector<phone>& a, const vector<phone>& b)
     } return res;
 }
 
-easy_dial::node::node (const char &c, const phone &telf, node* esq, node* cen, node* dre , node* pare) : _c(c), _telf(telf), _esq(esq), _dre(dre), _pare(pare){};
+easy_dial::node::node (const char &c, const phone &telf, node* esq, node* cen, node* dre , node* pare) : _c(c), _telf(telf), _esq(esq),_cen(cen), _dre(dre), _pare(pare){};
