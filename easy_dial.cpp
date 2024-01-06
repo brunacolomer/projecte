@@ -1,5 +1,5 @@
 #include "easy_dial.hpp"
-
+#include <algorithm> 
 
 /* Construeix un easy_dial a partir de la 
 informació continguda en el call_registry donat. El
@@ -8,10 +8,10 @@ easy_dial::easy_dial(const call_registry& R) throw(error) : _arrel(nullptr), _ac
     
    // _arrel=nullptr;
 
- 
+    _ant = nullptr;
    // _anterior = nullptr;
     freqtotal=0;
-
+    
     _p = false;
 
    vector<phone> v;
@@ -25,28 +25,29 @@ easy_dial::easy_dial(const call_registry& R) throw(error) : _arrel(nullptr), _ac
     //dins d'insereix que busca i=0; nom[i]; ++i
     //cout << v[i].nom() << endl;
     nat j=0;
-    //node *pare = nullptr;
-    _arrel = insereix(_arrel, j, nom+'\0', v[i]);
+    node *pare = nullptr;
+    _arrel = insereix(_arrel, j, nom+'\0', v[i], pare);
    }
    //cout << _arrel->_dre->_c << endl;
 }
 
 
-easy_dial::node* easy_dial::insereix(node *n, nat i, const string &k, phone tel){
+easy_dial::node* easy_dial::insereix(node *n, nat i, const string &k, phone tel, node *pare){
     if(i>=k.size()) return n;
     if(n==nullptr){
         n = new node(k[i],tel);
-        //n->_pare = pare;
+        n->_pare = pare;
         freqtotal+=tel.frequencia();
+        //cout << freqtotal << endl;
     }
     else if (n->_c == k[i]){
-        n->_cen=insereix(n->_cen, i+1, k, tel);
+        n->_cen=insereix(n->_cen, i+1, k, tel, n);
     }
     else if (k[i]<n->_c){
-        n->_esq=insereix(n->_esq, i, k, tel);
+        n->_esq=insereix(n->_esq, i, k, tel, n);
     }
     else {
-        n->_dre=insereix(n->_dre, i, k, tel);
+        n->_dre=insereix(n->_dre, i, k, tel, n);
     } return n;
 }
 
@@ -98,8 +99,9 @@ void easy_dial::esborra_nodes(node* m) {
 si F (S, '') no existeix llavors retorna l'string buit. */
 string easy_dial::inici() throw(){
     _p=true;
+    _pref = "";
     _actual = _arrel;
-    //_anterior = _arrel;
+    _ant = nullptr;
     string nom;
     if(_actual==nullptr) {
         nom = "";
@@ -120,20 +122,61 @@ Naturalment, es produeix un error si el prefix en curs inicial p
 fos indefinit. */
 string easy_dial::seguent(char c) throw(error){
     //_p += c;
+    
+    if(_actual==nullptr){
+        _p=false; // el prefix queda indefinit
+        throw error(ErrPrefixIndef);
+    } else if (_p==false) {
+        throw error(ErrPrefixIndef);
+    }
+    
+    //fes la cerca
+    _pref+=c;
+    _ant = _actual;
+    if(comença(_pref,_actual->_telf.nom())){
+        if(c=='\0')
+            _actual = cercador(_actual->_cen,c);
+        else
+            _actual = _actual->_cen;
+    }
+    else{
+        if(c>_actual->_c)
+            _actual = cercador(_actual->_dre,c);
+        else
+            _actual = cercador(_actual->_esq,c);
+    }
+        
+    if(_actual==nullptr) 
+        return "";
+    else
+        return _actual->_telf.nom();
+
+    
+    /*
+    _pref += c;
+    if(_p==false) throw error(ErrPrefixIndef);
     if(_actual==nullptr) {
         _p = false;
         throw error(ErrPrefixIndef);
     }
     else{
         //cout << "holi" << endl;
-    //_anterior = _actual;
-    if(_actual==_arrel)
+    _ant = _actual;
+
+    if(_actual==_arrel and c!=_actual->_c)
+        _actual = cercador(_actual, c);
+    else if (_actual==_arrel and c==_actual->_c)
+        _actual = _actual->_cen;
+    else if(c==_actual->_c and comença(_pref,_actual->_telf.nom()))
+        _actual = _actual->_cen;
+    else if(c!=_actual->_c)
         _actual = cercador(_actual, c);
     else
         _actual = cercador(_actual->_cen, c);
+    
     if(_actual==nullptr) return "";
     return _actual->_telf.nom();
-    }
+    }*/
 }
 
 /* Elimina l'últim caràcter del prefix en curs p = p' · a
@@ -144,15 +187,15 @@ quedi indefinit. Òbviament, també es produeix un error
 si p fos indefinit. */
 string easy_dial::anterior() throw(error){
     if(_p==false) throw error(ErrPrefixIndef);
-    if(_actual==nullptr) {
+    if(_ant==nullptr) {
         _p = false;
         throw error(ErrNoHiHaAnterior);
     }
-
+    _actual=_ant;
     //if(_actual->_pare==nullptr) throw error(ErrNoHiHaAnterior);
-    
+    _ant = _actual->_pare;
    // _actual = _anterior;
-    //_p.pop_back();
+    _pref.pop_back();
     return _actual->_telf.nom();
 }
 
@@ -169,14 +212,39 @@ nat easy_dial::num_telf() const throw(error){
 telèfon que comencen amb el prefix pref, en ordre lexicogràfic creixent. */
 void easy_dial::comencen(const string& pref, vector<string>& result) const throw(error){
     node* n = _arrel;
-    for(int i=0; i<pref.size(); i++){
-        n = cercador(n, pref[i]);
+    if(pref.size()==0){
+        inordre(n, result);
     }
-    //bool pare = true;
-    //for(int i=0; i<pref.size(); i++) if(pref[i] != n->_pare->telf.nom()[i]) pare = false;
-    //if(pare) result.push_back(n->_pare->telf.nom());
-    inordre(n, result);  
+    else {
+        nat i =0;
+        while(i<pref.size() and n!=nullptr){
+            n = cercador(n, pref[i]);
+            if (n!=nullptr and comença(pref,n->_telf.nom())){
+                result.push_back(n->_telf.nom());
+    
+            } if(n!=nullptr)n=n->_cen;
+            i ++;
+        }
+        
+        //bool pare = true;
+        //for(int i=0; i<pref.size(); i++) if(pref[i] != n->_pare->telf.nom()[i]) pare = false;
+        //if(pare) result.push_back(n->_pare->telf.nom());
+        if(n!=nullptr){
+            inordre(n, result);
+        }
+        
+    }sort(result.begin(), result.end());
 }
+bool easy_dial::comença(string pref, const string nom) const{
+    nat i =0;
+    bool com = true;
+    while(i<pref.size() and com){
+        if(nom[i]!=pref[i]) com = false;
+        else i++;
+    }
+    return com;
+}
+
 
 void easy_dial::inordre(node* n, vector<string>& result) const{
     if(n!=nullptr){
@@ -224,8 +292,13 @@ void easy_dial::calcula_mitjana(double& result, node* n, nat i) const{
         calcula_mitjana(result, n->_esq, i+1);
         calcula_mitjana(result, n->_dre, i+1);
         calcula_mitjana(result, n->_cen, i+1);
-        if (freqtotal != 0) 
-            result += i * (n->_telf.frequencia() / freqtotal);
+        if (freqtotal != 0){
+            //cout << freqtotal << endl;
+            //cout << n->_telf.frequencia() << ' ' << i <<  endl;
+            double f = n->_telf.frequencia();
+            result += i * f/freqtotal;
+            //cout << result << endl;
+        }
  
     // Maneig de l'error o comportament adequat en cas de freqtotal igual a zero
 }

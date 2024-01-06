@@ -4,16 +4,18 @@ struct node {
     node* _esq; // Fill esquerra, apunta a símbols mateixa posició formant un BST
     node* _cen; // Fill central, apunta a símbols següent posició
     node* _dre; // Fill dret, apunta a símbols mateixa posició formant un BST
-    //node* _pare;
+    node* _pare;
     node(const char &c, const phone &telf, node* esq = nullptr, node* cen = nullptr, node* dre = nullptr);
 };
 
 node* _arrel;
 node* _actual;
+string _pref;
 //node* _anterior;
+node* _ant;
 bool _p; // Prefix
-nat freqtotal;
-node* insereix(node *n, nat i, const string &k, phone tel);
+double freqtotal;
+node* insereix(node *n, nat i, const string &k, phone tel, node * pare);
 void ordena(vector<phone>& V) const;
 void parteix(vector<phone>& a, vector<phone>& b) const;
 vector<phone> fusiona(const vector<phone>& a, const vector<phone>& b) const;
@@ -23,3 +25,4 @@ void esborra_nodes(easy_dial::node* m);
 node* cercador(node *n, char c) const;
 void inordre(node* n, vector<string>& result) const;
 void calcula_mitjana(double& result, node* n, nat i) const;
+bool comença(string pref, const string nom) const;
