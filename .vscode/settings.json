@@ -4,6 +4,7 @@
         "iostream": "cpp",
         "error": "cpp",
         "util": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "numbers": "cpp"
     }
 }
