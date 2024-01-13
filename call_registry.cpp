@@ -40,6 +40,7 @@ call_registry::call_registry(const call_registry& R) throw(error){
 }
 
 call_registry& call_registry::operator=(const call_registry& R) throw(error){
+    this->~call_registry();
     _M = R._M;
     _quants = R._quants;
     _taula = new node_hash *[_M];
@@ -70,7 +71,15 @@ call_registry& call_registry::operator=(const call_registry& R) throw(error){
 }
 
 call_registry::~call_registry() throw(){
-
+     for(int i = 0; i < _M; ++i) {
+        node_hash *current = _taula[i];
+        while (current != nullptr) {
+            node_hash *temp = current;
+            current = current->_seg;
+            delete temp;
+        }
+    }
+    delete[] _taula;
 }
 
 /* Registra que s'ha realitzat una trucada al número donat, 
@@ -292,40 +301,55 @@ float call_registry::factor_de_carrega() const{
     return fc;
 };
 
+void call_registry::esborra_taula(node_hash **t, nat mida){
+
+    for (nat i = 0; i < mida; ++i) {
+        node_hash *current = t[i];
+        while (current != nullptr) {
+            node_hash *temp = current;
+            current = current->_seg;
+            delete temp;
+        }
+    }
+
+    delete[] t;
+};
+
 void call_registry::redispersió(float fc){
     //cout << _M << endl;
-    if(fc > 0.8){
-        //call_registry aux(2*(this->_M)+1);
-        call_registry aux;
-        aux._M =2*(this->_M)+1;
-        aux._taula = new node_hash *[aux._M];
-        for(int i = 0; i<aux._M; ++i){
-            aux._taula[i] = nullptr;
+       if(fc > 0.8){
+        nat m_aux = 2*(this->_M)+1;
+        node_hash ** t_aux = new node_hash *[m_aux];
+        for(int i = 0; i<m_aux; ++i){
+            t_aux[i] = nullptr;
         }
-        for(int i=0; i<_M; ++i){
-            node_hash *n = _taula[i];
+        swap(_taula, t_aux);
+        swap(_M, m_aux);
+        _quants = 0;
+        for(int i=0; i<m_aux; ++i){
+            node_hash *n = t_aux[i];
             while(n != nullptr){
-                aux.afegeix_numero(n->_p);
+                afegeix_numero(n->_p);
                 n=n->_seg;
             }
-        }swap(_M, aux._M);
-        swap(_taula, aux._taula);
-    }
+        } esborra_taula(t_aux, m_aux);
+    } // ((this->_M+1)/2);
     else if(fc < 0.3){
-        call_registry aux;
-        aux._M = ((this->_M+1)/2);
-        aux._taula = new node_hash *[aux._M];
-        for(int i = 0; i<aux._M; ++i){
-            aux._taula[i] = nullptr;
+        nat m_aux = (this->_M+1)/2;
+        node_hash ** t_aux = new node_hash *[m_aux];
+        for(int i = 0; i<m_aux; ++i){
+            t_aux[i] = nullptr;
         }
-        for(int i=0; i<_M; ++i){
-            node_hash *n = _taula[i];
-            while(n != NULL){
-                aux.afegeix_numero(n->_p);
+        swap(_taula, t_aux);
+        swap(_M, m_aux);
+        _quants = 0;
+        for(int i=0; i<m_aux; ++i){
+            node_hash *n = t_aux[i];
+            while(n != nullptr){
+                afegeix_numero(n->_p);
                 n=n->_seg;
             }
-        }swap(_M, aux._M);
-        swap(_taula, aux._taula);
+        } esborra_taula(t_aux, m_aux);
     }
     
     

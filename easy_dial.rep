@@ -17,14 +17,25 @@ node* _ant;
 bool _p; // Prefix
 double freqtotal;
 node* insereix(node *n, nat i, const string &k, phone tel, node * pare);
+
 void ordena(vector<phone>& V) const;
+
 void parteix(vector<phone>& a, vector<phone>& b) const;
+
 vector<phone> fusiona(const vector<phone>& a, const vector<phone>& b) const;
+
 node* cerca(node *n, char c) const;
+
 node* copia_nodes(node* m);
+
 void esborra_nodes(easy_dial::node* m);
-node* cercador(node *n, char c) ;
+
+node* cercador(node *n, char c);
+
 void inordre(node* n, vector<string>& result) const;
+
 void calcula_mitjana(double& result, node* n, nat i, bool central) const;
+
 bool comença(string pref, const string nom) const;
+
 bool pref(node *n) const;
