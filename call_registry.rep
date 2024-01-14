@@ -1,8 +1,8 @@
-/* Representació d'un conjunt de telèfons amb una taula de dispersió 
-ja que el cost d'inserir, consultar i suprimir és de mitjana constant
-// i per tant presenta una major eficiència respecte un BST(de mitjana 
+/* Representacio d'un conjunt de telefons amb una taula de dispersió 
+ja que el cost d'inserir, consultar i suprimir es de mitjana constant
+i per tant presenta una major eficiencia respecte un BST(de mitjana 
 cost logarítmic i com a cas pitjor cost lineal) i que un 
-AVL (mitjana i cas pitjor cost logarítmic)*/ 
+AVL (mitjana i cas pitjor cost logaritmic)*/ 
 
 struct node_hash{
     phone _p; //el p.num es el que s'utilitza per clasificar els nodes.
@@ -20,26 +20,19 @@ nat _quants;
 static long const MULT = 31415926;
 static long h(int k);
 
-// Pre: cert, la taula del paràmtere implicit 
-// Post: s'ha ajustat la mida de la taula adient segons el factor de càrrega
-void redispersió(float fc);
-
-
-float factor_de_carrega() const;
-
-//aquestes no haurien de ser de la classe.
-//void ordena(vector<string>& V) const;
-
-
-//void parteix(vector<string>& a, vector<string>& b) const;
-
-
-//vector<string> fusiona(const vector<string>& a, const vector<string>& b) const; 
+// Pre: cert
+// Post: s'ha ajustat la mida de la taula adient segons el factor de carrega
+// i s'han tornat a guardar els telefons en correspondència a la nova mida
+void redispersio(float fc);
 
 // Pre: cert
-// Post: 
+// Post: un float que representa el factor de carrega del parametre implicit
+float factor_de_carrega() const;
+
+// Pre: cert
+// Post: s'ha afegit el telefon p al parametre implicit
 void afegeix_numero(phone p);
 
-// Pre:
-// Post:
+// Pre: cert, mida = mida de la taula t
+// Post: s'ha esborrat la taula de node_hash t de mida = mida
 void esborra_taula(node_hash **t, nat mida);

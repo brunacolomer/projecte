@@ -1,10 +1,30 @@
+/*L'estructura de dades escollida es una variant d'un TST. Consisteix en un arbre ternari de cerca
+però que en comptes de guardar tots els símbols de cada clau només en guardem un, d'aquesta manera
+l'arbre només té tants nodes com telèfons que volem guardar. Funciona de la següent manera:
+Si volem guardar JAUME, JOANNA, JOAN, ALEIX, ZOE, ZOELIA (ordenats de major a menor frequència)
+
+                    J
+                  / | \
+                 A  O  Z 
+                    |  |
+                    A  O
+
+On J és l'arrel i conté la informació de Jaume, el seu fill esquerra conté A: Aleix
+El seu fill dret conté Z: Zoe i el seu fill central conté O: JOANNA, i el fill central
+de O conté A: Joan. I finalment el fill central de Z es O: Zoelia.
+La tria d'aquesta estructura de dades és per tal de simplificar els mètodes inici,
+següent i anterior. Ja que si fas inici et retorna l'arrel(Jaume, el telèfon amb major freq.), 
+si després fas seguent(Z) et retorna el fill esquerra que coincideix amb aquesta lletra: ZOE.
+i si en comptes de ZOE el telefon que estas buscant és Zoelia escriuràs la O que coincidirà
+amb el fill central de Zoe i et retornarà aquest telèfon. */
+
 struct node {
-    char _c;    // Símbol posició i-èssima de la clau
+    char _c;
     phone _telf;
-    node* _esq; // Fill esquerra, apunta a símbols mateixa posició formant un BST
+    node* _esq; // Fill esquerra, apunta a símbols mateixa posició(lexicograficament inferiors)
     node* _cen; // Fill central, apunta a símbols següent posició
-    node* _dre; // Fill dret, apunta a símbols mateixa posició formant un BST
-    node* _pare;
+    node* _dre; // Fill dret, apunta a símbols mateixa posició(lexicograficament majors)
+    node* _pare; // Apunta a pare o a l'anterior del node.
     node(const char &c, const phone &telf, node* esq = nullptr, node* cen = nullptr, node* dre = nullptr);
 };
 
@@ -12,30 +32,42 @@ node* _arrel;
 node* _actual;
 string _pref;
 nat _nivell;
-//node* _anterior;
 node* _ant;
-bool _p; // Prefix
+bool _p; // True quan s'inicia el prefix
 double freqtotal;
+
+// Pre:
+// Post:
 node* insereix(node *n, nat i, const string &k, phone tel, node * pare);
 
-void ordena(vector<phone>& V) const;
-
-void parteix(vector<phone>& a, vector<phone>& b) const;
-
-vector<phone> fusiona(const vector<phone>& a, const vector<phone>& b) const;
-
+// Pre:
+// Post:
 node* cerca(node *n, char c) const;
 
+// Pre:
+// Post:
 node* copia_nodes(node* m);
 
+// Pre:
+// Post:
 void esborra_nodes(easy_dial::node* m);
 
+// Pre:
+// Post:
 node* cercador(node *n, char c);
 
+// Pre:
+// Post:
 void inordre(node* n, vector<string>& result) const;
 
+// Pre:
+// Post:
 void calcula_mitjana(double& result, node* n, nat i, bool central) const;
 
+// Pre:
+// Post:
 bool comença(string pref, const string nom) const;
 
+// Pre:
+// Post:
 bool pref(node *n) const;
