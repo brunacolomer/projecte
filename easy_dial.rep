@@ -16,7 +16,11 @@ La tria d'aquesta estructura de dades és per tal de simplificar els mètodes in
 següent i anterior. Ja que si fas inici et retorna l'arrel(Jaume, el telèfon amb major freq.), 
 si després fas seguent(Z) et retorna el fill esquerra que coincideix amb aquesta lletra: ZOE.
 i si en comptes de ZOE el telefon que estas buscant és Zoelia escriuràs la O que coincidirà
-amb el fill central de Zoe i et retornarà aquest telèfon. */
+amb el fill central de Zoe i et retornarà aquest telèfon. 
+
+Posteriorment ens hem adonat que hauria sigut més senzill que a l'arrel no haguéssim guardat
+la primera lletra per poder facilitar encara més la funció de següent, ja que llavors en aquest exemple
+la J estaria a la posició de la O i correspondria a la lletra que s'ha d'escriure per obtenir Joan.*/
 
 struct node {
     char _c;
@@ -33,24 +37,26 @@ node* _actual;
 string _pref;
 nat _nivell;
 node* _ant;
-bool _p; // True quan s'inicia el prefix
+bool _p; // Boolea que indica si el prefix es indefinit o no
 double freqtotal;
 
-// Pre:
-// Post:
+// Pre: n apunta a nullptr o a un subarbre del parametre implicit
+// k es el nom
+// Post: retorna un node que apunta a un subarbre del p.i. que conte n
+
 node* insereix(node *n, nat i, const string &k, phone tel, node * pare);
 
-// Pre:
-// Post:
+// Pre: n apunta a nullptr o a un subarbre del parametre implicit
+// Post: retorna el subarbre que te d'arrel un node amb _c==c
 node* cerca(node *n, char c) const;
 
-// Pre:
+// Pre: 
 // Post:
 node* copia_nodes(node* m);
 
-// Pre:
-// Post:
-void esborra_nodes(easy_dial::node* m);
+// Pre: m apunta a nullpyr o a un subarbre del paramatre implicit
+// Post: Esborra tots els nodes del subarbre m
+void esborra_nodes(node* m);
 
 // Pre:
 // Post:
@@ -60,14 +66,10 @@ node* cercador(node *n, char c);
 // Post:
 void inordre(node* n, vector<string>& result) const;
 
-// Pre:
+// Pre: n apunta a nullptr o a un subarbre del parametre implicit
 // Post:
 void calcula_mitjana(double& result, node* n, nat i, bool central) const;
 
-// Pre:
-// Post:
-bool comença(string pref, const string nom) const;
-
-// Pre:
-// Post:
-bool pref(node *n) const;
+// Pre: cert
+// Post: retorna cert si pref es prefix de nom, fals altrament
+bool comenca(string pref, const string nom) const;

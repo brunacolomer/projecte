@@ -3,21 +3,23 @@
 
 // Representacio de Theta amb 0
 
-// Pre:
-// Post:
-// Cost
+// Pre: Cert
+// Post: El vector V està ordenat de menor a major
+// Cost: 0(n) cost lineal
 template <typename T>
 void ordena(vector<T>& V);
 
-// Pre:
-// Post:
-// Cost:
+// Pre: b es buit.
+// Post: a conte la meitat d'elements que tenia inicialment
+// i b conte l'altra meitat
+// Cost: 0(n) cost lineal. Sent n la mida de a
 template <typename T>
 void parteix(vector<T>& a, vector<T>& b);
 
-// Pre:
-// Post:
-// Cost:
+// Pre: a i b estan ordenats en orde ascentend
+// Post: retorna un vector ordenat que conte tots 
+// els elements de a i b
+// Cost: 0(n) cost lineal
 template <typename T>
 vector<T> fusiona(const vector<T>& a, const vector<T>& b);
 
@@ -187,7 +189,7 @@ void easy_dial::comencen(const string& pref, vector<string>& result) const throw
         nat i =0;
         while(i<pref.size() and n!=nullptr){
             n = cerca(n, pref[i]);
-            if (n!=nullptr and comença(pref,n->_telf.nom())){
+            if (n!=nullptr and comenca(pref,n->_telf.nom())){
                 result.push_back(n->_telf.nom());
     
             } if(n!=nullptr)n=n->_cen;
@@ -200,7 +202,7 @@ void easy_dial::comencen(const string& pref, vector<string>& result) const throw
         
     } ordena(result);
 }
-bool easy_dial::comença(string pref, const string nom) const{
+bool easy_dial::comenca(string pref, const string nom) const{
     nat i =0;
     bool com = true;
     while(i<pref.size() and com){
@@ -222,10 +224,10 @@ void easy_dial::inordre(node* n, vector<string>& result) const{
 
 easy_dial::node* easy_dial::cercador(node *n, char c) {
  if(n!=nullptr){
-        if (pref(n) and _ant!=n)
+        if (comenca(_pref, n->_telf.nom()) and _ant!=n)
             return n;
 
-        else if(pref(n) and _ant==n)
+        else if(comenca(_pref, n->_telf.nom()) and _ant==n)
             n = cercador(n->_cen, c);
 
         else if (c<n->_c)
@@ -250,16 +252,6 @@ if(n!=nullptr){
         }
     }
     return n;
-}
-
-bool easy_dial::pref(node *n) const{
-    bool iguals = true;
-    nat i = 0;
-    while(i<_pref.size() and iguals){
-        if (n->_telf.nom()[i]!= _pref[i]) iguals = false;
-        else i++;
-    } 
-    return iguals;
 }
 
 /* Retorna el número mitjà de pulsacions necessàries para obtenir un
