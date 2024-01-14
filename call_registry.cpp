@@ -355,57 +355,6 @@ void call_registry::redispersió(float fc){
     
 };
 
-void call_registry::ordena(vector<string>& V) const{
-    if(V.size()<2) return;
-    vector<string> a = V;
-    vector<string> b;
-    parteix(a,b);
-    ordena(a);
-    ordena(b);
-    V = fusiona(a,b);
-};
-
-void call_registry::parteix(vector<string>& a, vector<string>& b) const{
-    //cout << "parteix" <<endl;
-    int  mida = int(a.size()/2);
-    int n = int(a.size()) -1;
-    for(unsigned int i = n; i >= mida; i--){
-        b.push_back(a[i]);
-        a.pop_back();
-    }
-    //cout << size(b) << endl;
-}
-
-vector<string> call_registry::fusiona(const vector<string>& a, const vector<string>& b) const{
-    //cout << "fusiona" <<endl;
-    vector<string> res;
-    int sa = int(a.size());
-    int sb = int(b.size());
-    //cout << sb << endl;
-    int ia = 0;
-    int ib = 0;
-    while((ia<sa) and (ib<sb)){
-        //cout << "m" << endl;
-        if(a[ia]<b[ib]) {
-            //cout << a[ia] << endl;
-            res.push_back(a[ia]);
-            ia++;
-        } else {
-            res.push_back(b[ib]);
-            ib++;
-        }
-    }
-    while(ia<sa){
-        //cout << "hola";
-        res.push_back(a[ia]);
-        ia++;
-    }
-
-    while(ib<sb){
-        res.push_back(b[ib]);
-        ib++;
-    } return res;
-}
 
 void call_registry::afegeix_numero(phone p){
     int pos = h(p.numero()) % _M;
@@ -436,6 +385,60 @@ void call_registry::afegeix_numero(phone p){
             ++(element->_p);
         }
     }
+}
+
+// ALTRES FUNCIONS AUXILIARS
+
+void ordena(vector<string>& V) const{
+    if(V.size()<2) return;
+    vector<string> a = V;
+    vector<string> b;
+    parteix(a,b);
+    ordena(a);
+    ordena(b);
+    V = fusiona(a,b);
+};
+
+void parteix(vector<string>& a, vector<string>& b) const{
+    //cout << "parteix" <<endl;
+    int  mida = int(a.size()/2);
+    int n = int(a.size()) -1;
+    for(unsigned int i = n; i >= mida; i--){
+        b.push_back(a[i]);
+        a.pop_back();
+    }
+    //cout << size(b) << endl;
+}
+
+vector<string> fusiona(const vector<string>& a, const vector<string>& b) const{
+    //cout << "fusiona" <<endl;
+    vector<string> res;
+    int sa = int(a.size());
+    int sb = int(b.size());
+    //cout << sb << endl;
+    int ia = 0;
+    int ib = 0;
+    while((ia<sa) and (ib<sb)){
+        //cout << "m" << endl;
+        if(a[ia]<b[ib]) {
+            //cout << a[ia] << endl;
+            res.push_back(a[ia]);
+            ia++;
+        } else {
+            res.push_back(b[ib]);
+            ib++;
+        }
+    }
+    while(ia<sa){
+        //cout << "hola";
+        res.push_back(a[ia]);
+        ia++;
+    }
+
+    while(ib<sb){
+        res.push_back(b[ib]);
+        ib++;
+    } return res;
 }
 
 

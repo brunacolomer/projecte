@@ -1,3 +1,8 @@
+/* Representació d'un conjunt de telèfons amb una taula de dispersió 
+ja que el cost d'inserir, consultar i suprimir és de mitjana constant
+// i per tant presenta una major eficiència respecte un BST(de mitjana 
+cost logarítmic i com a cas pitjor cost lineal) i que un 
+AVL (mitjana i cas pitjor cost logarítmic)*/ 
 
 struct node_hash{
     phone _p; //el p.num es el que s'utilitza per clasificar els nodes.
@@ -10,14 +15,31 @@ node_hash **_taula;
 nat _M;
 nat _quants;
 
-//node_hash(const phone p, node_hash *seg = NULL): _p(p), _seg(seg){}
-
+// Pre:
+// Post:
 static long const MULT = 31415926;
 static long h(int k);
+
+// Pre: cert, la taula del paràmtere implicit 
+// Post: s'ha ajustat la mida de la taula adient segons el factor de càrrega
 void redispersió(float fc);
+
+
 float factor_de_carrega() const;
-void ordena(vector<string>& V) const;
-void parteix(vector<string>& a, vector<string>& b) const;
-vector<string> fusiona(const vector<string>& a, const vector<string>& b) const; 
+
+//aquestes no haurien de ser de la classe.
+//void ordena(vector<string>& V) const;
+
+
+//void parteix(vector<string>& a, vector<string>& b) const;
+
+
+//vector<string> fusiona(const vector<string>& a, const vector<string>& b) const; 
+
+// Pre: cert
+// Post: 
 void afegeix_numero(phone p);
+
+// Pre:
+// Post:
 void esborra_taula(node_hash **t, nat mida);

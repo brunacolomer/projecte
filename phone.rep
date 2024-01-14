@@ -1,3 +1,5 @@
+// Només necessitem tres atributs per representar el nom, número i frequencia d'un telèfon
+// No utilitzem cap mètode auxiliar per la classe phone
 
 string name_phone;
 nat number;

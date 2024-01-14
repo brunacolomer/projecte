@@ -1,12 +1,10 @@
 #include "phone.hpp"
-/* Construeix un telèfon a partir del seu número (num), el seu nom
-(name) i el seu comptador de trucades (compt). 
-Es produeix un error si name no és un identificador legal. */
-
 
 phone::phone(nat num, const string& name, nat compt) throw(error){
+    // Cost: O(n), on n és la longitud de l'string 'name'
     for(nat i=0; i<name.size();i++){
-        if(name[i]==DELETECHAR or name[i]==ENDCHAR or name[i]==ENDPREF) throw error(ErrNomIncorrecte);
+        if(name[i]==DELETECHAR or name[i]==ENDCHAR or name[i]==ENDPREF) 
+            throw error(ErrNomIncorrecte);
     }
     name_phone = name;
     freq= compt;
@@ -15,6 +13,7 @@ phone::phone(nat num, const string& name, nat compt) throw(error){
 
 /* Tres grans. Constructor per còpia, operador d'assignació i destructor. */
 phone::phone(const phone& T) throw(error) {
+    // Cost: O(1). Constant
     name_phone = T.name_phone;
     number = T.number;
     freq = T.freq;
@@ -22,51 +21,51 @@ phone::phone(const phone& T) throw(error) {
 
 
 phone& phone::operator=(const phone& T) throw(error){
+    // Cost: O(1). Constant
     name_phone = T.name_phone;
     number = T.number;
     freq = T.freq;
     return *this;
 }
 
-phone::~phone() throw(){}
+phone::~phone() throw(){
+    // Cost: O(1). Constant
+}
 
 /* Retorna el número de telèfon. */
 nat phone::numero() const throw(){
+    // Cost: O(1). Constant
     return number;
 }
 
 /* Retorna el name associat al telèfon, eventualment l'string buit. */
 string phone::nom() const throw(){
+    // Cost: O(1). Constant
     return name_phone;
 }
 
 /* Retorna el número de vegades que s'ha trucat al telèfon. */
 nat phone::frequencia() const throw(){
+    // Cost: O(1). Constant
     return freq;
 }
 
-/* Operador de preincrement. 
-Incrementa en 1 el número de vegades que s'ha trucat al telèfon i
-retorna una referència a aquest telèfon. */
+/* Operador de preincrement. */
 phone& phone::operator++() throw(){
+    // Cost: O(1). Constant
     freq = freq + 1;
     return *this;
 }
 
-/* Operador de postincrement. 
-Incrementa en 1 el número de vegades que s'ha trucat al telèfon i
-retorna una còpia d'aquest telèfon sense incrementar. */
+/* Operador de postincrement. */
 phone phone::operator++(int) throw(){
+    // Cost: O(1). Constant
     phone aux = *this;
     freq = freq + 1;
     return aux;
 }
 
-/* Operadors de comparació.  L'operador > retorna cert, si i nameés si, el
-telèfon sobre el que s'aplica el mètode és més freqüent que el
-telèfon T, o a igual freqüència, el name associat al telèfon és
-major en ordre lexicogràfic que el name associat a T. 
-La resta d'operadors es defineixen consistentment respecte a >. */
+/* Operadors de comparació.  */
 
 bool phone::operator==(const phone& T) const throw(){
     bool igual = false;
@@ -110,13 +109,3 @@ static const int  ErrNomIncorrecte = 11;
 
 
 // g++ phone.cpp -o phone.e -O0 -g -Wall -Wextra -Werror -Wno-sign-compare -std=c++14 -ansi -I /home/bruna/ESIN/projecte/incl -lesin
-/*
-int main() {
-    // Your program logic here
-    phone aux1(645345324,"Jaume",0);
-    phone aux2(aux1);
-    cout << aux1.nom() << endl;
-    if(aux2==aux1) cout << "Funciona!!!!!" << endl;
-    cout << aux1.numero() << endl;
-    return 0;
-}*/
